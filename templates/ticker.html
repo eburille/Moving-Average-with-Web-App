@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+{% block content %}
+<h3>
+    {{ticker}}  - {{melhor_resultado.status_atual}}  --- Inicio {{melhor_resultado.first_data}}
+</h3>
+<p>
+    Multiplicação patrimonial {{melhor_resultado.patrimonio}} ----- N° de operações {{melhor_resultado.numero_operacoes }} --------- Taxa de acerto {{ melhor_resultado.taxa_acerto }}% ------ Drawdown {{ melhor_resultado.drawdown }}% --------- Maior Retorno {{ melhor_resultado.maior_retorno }}% 
+</p>
+<p>   
+    Melhor periodo {{melhor_resultado.periodo}} ------------------- Operações ganhas {{ melhor_resultado.operacoes_ganhas}}---- Operações perdidas {{melhor_resultado.operacoes_perdas}} --- Media dos ganhos {{melhor_resultado.media_ganhos}}% -- Media das perdas {{melhor_resultado.media_perdas}}%
+</p>
+<p>Apenas compra {{melhor_resultado.longonly}}% --------- Retorno total {{melhor_resultado.retorno_total}}%</p>
+<p>.</p>
+<p>
+    Teste outros periodos abaixo
+</p>
+<form method="POST">
+    <input type="text" name="periodo"/>
+    <input type="submit" name="oi"/>
+</form>
+{% if periodo != 0 %}
+<p>
+    Multiplicação patrimonial - {{ resultado.patrimonio }} ----- Numero de operações {{ resultado.numero_operacoes }}
+</p>
+<p>   
+    Melhor periodo - {{ resultado.periodo }} ----------------- Operações ganhas 
+</p>
+{% endif %}    
+
+{% endblock %}
