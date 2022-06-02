@@ -1,5 +1,5 @@
 from flask import Flask, render_template, request, redirect, url_for
-from precoXmm import func
+from downloader import otimizador, res
 
 app = Flask(__name__)
 
@@ -12,24 +12,19 @@ def homepage():
         
     return render_template("inicio.html")
 
-@app.route('/<ticker>', methods=['POST', 'GET'])
+@app.route('/<ticker>', methods=['GET', 'POST'])
 def empresa(ticker):
 
     outro_periodo = 0
-
-    maior_patrimonio = 0
  
-    if func(2, ticker) == 'erro':
+    melhor_resultado = otimizador(ticker)
+
+    if melhor_resultado == 'Erro':
         return redirect(url_for('erro', ticker=ticker))
-    for period in range(1, 150):
-        retorno = func(period, ticker)
-        if retorno.patrimonio > maior_patrimonio:
-            maior_patrimonio = retorno.patrimonio
-            melhor_resultado = retorno
-    
+
     if len(request.form) > 0:
         outro_periodo = int(request.form['periodo'])
-        resultado = func(outro_periodo, ticker)
+        resultado = res(ticker, outro_periodo)
         return render_template("ticker.html", melhor_resultado=melhor_resultado, resultado=resultado, ticker=ticker)
         
     return render_template("ticker.html", melhor_resultado=melhor_resultado, ticker=ticker, periodo=0)
