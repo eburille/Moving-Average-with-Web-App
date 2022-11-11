@@ -1,4 +1,5 @@
 import pandas_datareader.data as web
+from datetime import datetime
 
 def mm_stats(cotação, media):
     if cotação > media:
@@ -19,7 +20,7 @@ def mm_rent(entrada, saida, status, patrimonio):
 
     elif status == 'compra' and entrada != 0:
         rentab = (-(saida - entrada)) / entrada
-        return (rentab + 1)
+        return 1
 
     else:
         return patrimonio
@@ -29,6 +30,14 @@ def mm_media_ganhos(retorno_ganho, med_ganho):
 
 def mm_media_perdas(retorno_perda, med_perda):
     return (retorno_perda + med_perda)/2
+
+def delta_time(ti, tf):
+    t1 = datetime.strptime(ti, '%Y-%m-%d').date()
+    t2 = datetime.strptime(tf, '%Y-%m-%d').date()
+
+    delta = t2 - t1
+
+    return delta.days/365
 
 class Retorno():
     drawdown=1
@@ -44,6 +53,10 @@ class Retorno():
     taxa_acerto = 0
     first_data = 0
     longonly = 0
+    preco_reversao = 0
+    cotacao_atual = 0
+    anual = 0
+    ticker = ''
     
 
     def __init__(self, period):
@@ -67,10 +80,12 @@ class MM():
 
         self.media = media(self.cotacoes)
 
-def mm_main(period, cot):
+def mm_main(period, cot, ticker):
 
     retorno = Retorno(period)
     mm = MM()
+
+    retorno.ticker = ticker
 
     mm.cotacoes = []
 
@@ -95,6 +110,7 @@ def mm_main(period, cot):
             primeira_operação = mm_start(primeira_operação, status, check_status)
                 
             ultima_cotacao = float(row['Adj Close'])
+            ultima_data = str(indice)[:10]
                 
             if primeira_operação == True and check_status != status:
                     
@@ -120,7 +136,9 @@ def mm_main(period, cot):
             mm.cotacoes.pop(0)
             mm.cotacoes.append(float(row['Close']))
 
+    delta = delta_time(retorno.first_data, ultima_data)
 
+    retorno.anual = round((retorno.patrimonio**(1/delta)-1)*100, 2)
     retorno.media_perdas = round(      (1-retorno.media_perdas)*100,       2)
     retorno.media_ganhos = round(     ((retorno.media_ganhos-1)*100),      2)
     retorno.drawdown = round(         ((1-retorno.drawdown)*100),          2)    
@@ -133,6 +151,8 @@ def mm_main(period, cot):
         retorno.longonly = round(    (ultima_cotacao - mm.primeira_cot) / mm.primeira_cot * 100  ,2)
     except:
         retorno.longonly = 0
+    retorno.preco_reversao = round(mm.media, 2)
+    retorno.cotacao_atual = round(ultima_cotacao, 2)
 
     return retorno
 
